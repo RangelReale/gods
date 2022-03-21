@@ -4,8 +4,6 @@
 
 package utils
 
-import "time"
-
 // Comparator will make type assertion (see IntComparator for example),
 // which will panic if a or b are not of the asserted type.
 //
@@ -13,12 +11,10 @@ import "time"
 //    negative , if a < b
 //    zero     , if a == b
 //    positive , if a > b
-type Comparator func(a, b interface{}) int
+type Comparator[T any] func(a, b T) int
 
 // StringComparator provides a fast comparison on strings
-func StringComparator(a, b interface{}) int {
-	s1 := a.(string)
-	s2 := b.(string)
+func StringComparator(s1, s2 string) int {
 	min := len(s2)
 	if len(s1) < len(s2) {
 		min = len(s1)
@@ -40,9 +36,7 @@ func StringComparator(a, b interface{}) int {
 }
 
 // IntComparator provides a basic comparison on int
-func IntComparator(a, b interface{}) int {
-	aAsserted := a.(int)
-	bAsserted := b.(int)
+func IntComparator(aAsserted, bAsserted int) int {
 	switch {
 	case aAsserted > bAsserted:
 		return 1
@@ -53,6 +47,7 @@ func IntComparator(a, b interface{}) int {
 	}
 }
 
+/*
 // Int8Comparator provides a basic comparison on int8
 func Int8Comparator(a, b interface{}) int {
 	aAsserted := a.(int8)
@@ -249,3 +244,4 @@ func TimeComparator(a, b interface{}) int {
 		return 0
 	}
 }
+*/
