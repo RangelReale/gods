@@ -53,3 +53,8 @@ func StringComparator(s1, s2 string) int {
 	}
 	return 0
 }
+
+// AnyComparator provides a comparator that always assumes the second value is higher
+func AnyComparator(s1, s2 interface{}) int {
+	return 1
+}
