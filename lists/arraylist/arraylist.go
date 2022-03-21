@@ -26,6 +26,7 @@ func assertListImplementation() {
 type List[T any] struct {
 	elements   []T
 	size       int
+	equals     utils.EqualsComparator[T]
 	comparator utils.Comparator[T]
 }
 
@@ -36,13 +37,14 @@ const (
 
 // New instantiates a new list and adds the passed values, if any, to the list
 func New[T constraints.Ordered](values ...T) *List[T] {
-	return NewWithComparator(utils.OrderedComparator[T], values...)
+	return NewWithComparator(utils.ComparableEqualsComparator[T], utils.OrderedComparator[T], values...)
 }
 
 // NewWithComparator instantiates a new list with a user-defined comparator and adds the passed values,
 // if any, to the list
-func NewWithComparator[T any](comparator utils.Comparator[T], values ...T) *List[T] {
+func NewWithComparator[T any](equals utils.EqualsComparator[T], comparator utils.Comparator[T], values ...T) *List[T] {
 	list := &List[T]{
+		equals:     equals,
 		comparator: comparator,
 	}
 	if len(values) > 0 {
@@ -91,11 +93,10 @@ func (list *List[T]) Remove(index int) {
 // Performance time complexity of n^2.
 // Returns true if no arguments are passed at all, i.e. set is always super-set of empty set.
 func (list *List[T]) Contains(values ...T) bool {
-
 	for _, searchValue := range values {
 		found := false
 		for _, element := range list.elements {
-			if list.comparator(element, searchValue) == 0 {
+			if list.equals(element, searchValue) {
 				found = true
 				break
 			}
@@ -120,7 +121,7 @@ func (list *List[T]) IndexOf(value T) int {
 		return -1
 	}
 	for index, element := range list.elements {
-		if list.comparator(element, value) == 0 {
+		if list.equals(element, value) {
 			return index
 		}
 	}

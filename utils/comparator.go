@@ -6,11 +6,19 @@ package utils
 
 import "golang.org/x/exp/constraints"
 
+// EqualsComparator returns whether the values are equals
+type EqualsComparator[T any] func(a, b T) bool
+
 // Comparator should return a number:
 //    negative , if a < b
 //    zero     , if a == b
 //    positive , if a > b
 type Comparator[T any] func(a, b T) int
+
+// ComparableEqualsComparator provides a basic equals comparison for comparable
+func ComparableEqualsComparator[T comparable](a, b T) bool {
+	return a == b
+}
 
 // OrderedComparator provides a basic comparison for constraints.Ordered
 func OrderedComparator[T constraints.Ordered](a, b T) int {
