@@ -11,6 +11,7 @@ package arraylist
 
 import (
 	"fmt"
+	"golang.org/x/exp/constraints"
 	"strings"
 
 	"github.com/emirpasic/gods/lists"
@@ -23,8 +24,9 @@ func assertListImplementation() {
 
 // List holds the elements in a slice
 type List[T any] struct {
-	elements []T
-	size     int
+	elements   []T
+	size       int
+	comparator utils.Comparator[T]
 }
 
 const (
@@ -33,8 +35,16 @@ const (
 )
 
 // New instantiates a new list and adds the passed values, if any, to the list
-func New[T any](values ...T) *List[T] {
-	list := &List[T]{}
+func New[T constraints.Ordered](values ...T) *List[T] {
+	return NewWithComparator(utils.OrderedComparator[T], values...)
+}
+
+// NewWithComparator instantiates a new list with a user-defined comparator and adds the passed values,
+// if any, to the list
+func NewWithComparator[T any](comparator utils.Comparator[T], values ...T) *List[T] {
+	list := &List[T]{
+		comparator: comparator,
+	}
 	if len(values) > 0 {
 		list.Add(values...)
 	}
@@ -80,12 +90,12 @@ func (list *List[T]) Remove(index int) {
 // All elements have to be present in the set for the method to return true.
 // Performance time complexity of n^2.
 // Returns true if no arguments are passed at all, i.e. set is always super-set of empty set.
-func (list *List[T]) Contains(values []T, comparator utils.Comparator[T]) bool {
+func (list *List[T]) Contains(values ...T) bool {
 
 	for _, searchValue := range values {
 		found := false
 		for _, element := range list.elements {
-			if comparator(element, searchValue) == 0 {
+			if list.comparator(element, searchValue) == 0 {
 				found = true
 				break
 			}
@@ -105,12 +115,12 @@ func (list *List[T]) Values() []T {
 }
 
 //IndexOf returns index of provided element
-func (list *List[T]) IndexOf(value T, comparator utils.Comparator[T]) int {
+func (list *List[T]) IndexOf(value T) int {
 	if list.size == 0 {
 		return -1
 	}
 	for index, element := range list.elements {
-		if comparator(element, value) == 0 {
+		if list.comparator(element, value) == 0 {
 			return index
 		}
 	}
@@ -134,11 +144,11 @@ func (list *List[T]) Clear() {
 }
 
 // Sort sorts values (in-place) using.
-func (list *List[T]) Sort(comparator utils.Comparator[T]) {
+func (list *List[T]) Sort() {
 	if len(list.elements) < 2 {
 		return
 	}
-	utils.Sort(list.elements[:list.size], comparator)
+	utils.Sort(list.elements[:list.size], list.comparator)
 }
 
 // Swap swaps the two values at the specified positions.

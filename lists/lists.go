@@ -11,7 +11,6 @@ package lists
 
 import (
 	"github.com/emirpasic/gods/containers"
-	"github.com/emirpasic/gods/utils"
 )
 
 // List interface that all lists implement
@@ -19,8 +18,8 @@ type List[T any] interface {
 	Get(index int) (T, bool)
 	Remove(index int)
 	Add(values ...T)
-	Contains(values []T, comparator utils.Comparator[T]) bool
-	Sort(comparator utils.Comparator[T])
+	Contains(values ...T) bool
+	Sort()
 	Swap(index1, index2 int)
 	Insert(index int, values ...T)
 	Set(index int, value T)
